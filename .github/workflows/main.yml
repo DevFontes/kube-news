@@ -24,6 +24,6 @@ jobs:
         file: ./src/Dockerfile
         push: true
         tags: |
-          julioesf/kube-news:v1
+          julioesf/kube-news:${{github.run_number}}
           julioesf/kube-news:latest
           
