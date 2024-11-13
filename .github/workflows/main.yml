@@ -17,7 +17,7 @@ jobs:
         username: ${{secrets.DOCKERHUB_USER}}
         password: ${{secrets.DOCKERHUB_PASSWD}}
       
-    - name: DockerImage Build
+    - name: DockerImage Build and Push
       uses: docker/build-push-action@v6.9.0
       with:
         context: ./src
@@ -27,3 +27,18 @@ jobs:
           julioesf/kube-news:${{github.run_number}}
           julioesf/kube-news:latest
           
+  CD:
+    runs-on: ubuntu-latest
+    needs: CI
+
+    steps:
+    - uses: actions/checkout@v4.2.2
+
+    - name: Kubernetes Set Context
+      uses: Azure/k8s-set-context@v3.0
+      with:
+        method: kubeconfig
+        kubeconfig: ${{secrets.KUBE_CONFIG}}
+        context: ${{secrets.KUBE_CONTEXT}}
+    
+    name: Deploy to Kubernetes
