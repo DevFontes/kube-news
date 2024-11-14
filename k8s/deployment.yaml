@@ -142,5 +142,5 @@ spec:
               number: 80
   tls:
   - hosts:
-    - kubenews.masterinfra.io
+    - kubenews.masterinfra.net
     secretName: kubenews-tls
