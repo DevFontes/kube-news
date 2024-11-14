@@ -42,7 +42,7 @@ jobs:
         context: ${{secrets.KUBE_CONTEXT}}
 
     - name: Kubernetes Deployment
-      uses: TanmoySG/k-deploy-action@v0.2.2-alpha
+      uses: Azure/k8s-deploy@v4.9
       with:
         images: julioesf/kube-news:${{github.run_number}}
         manifests: |
