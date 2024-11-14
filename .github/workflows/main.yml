@@ -40,5 +40,13 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{secrets.KUBE_CONFIG}}
         context: ${{secrets.KUBE_CONTEXT}}
+
+    - name: Kubernetes Deployment
+      uses: TanmoySG/k-deploy-action@v0.2.2-alpha
+      with:
+        images: julioesf/kube-news:${{github.run_number}}
+        manifests: |
+          k8s/deployment.yaml
+        
+
     
-    name: Deploy to Kubernetes
