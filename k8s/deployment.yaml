@@ -125,10 +125,12 @@ kind: Ingress
 metadata:
   name: kubenews
   namespace: kubenews
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   rules:
-  - host: kubenews.masterinfra.io
+  - host: kubenews.masterinfra.net
     http:
       paths:
       - pathType: Prefix
