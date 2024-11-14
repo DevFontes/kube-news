@@ -40,7 +40,38 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{secrets.KUBE_CONFIG}}
         context: ${{secrets.KUBE_CONTEXT}}
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1 # ajuste conforme sua região
 
+    - name: Update Route 53 record
+      run: |
+        aws route53 change-resource-record-sets --hosted-zone-id ZONE_ID \
+          --change-batch '{
+            "Changes": [
+              {
+                "Action": "UPSERT",
+                "ResourceRecordSet": {
+                  "Name": "kubenews.masterinfra.net.",
+                    "Type": "A",
+                    "TTL": 300,
+                    "ResourceRecords": [
+                      {
+                        "Value": "198.244.200.204"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }'
+        env:
+          ZONE_ID: "Z02107982DFK4A9701QHT"
+          IP_ADDRESS: "198.244.200.204"
+    
     - name: Kubernetes Deployment
       uses: Azure/k8s-deploy@v4.9
       with:
