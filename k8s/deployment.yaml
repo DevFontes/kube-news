@@ -89,14 +89,14 @@ spec:
         ports:
         - containerPort: 8080
         env:
-        - name: POSTGRES_USER
+        - name: DB_DATABASE
           value: "kubenews"
-        - name: POSTGRES_PASSWORD
-          value: "Pg#123"
-        - name: POSTGRES_DB
+        - name: DB_USERNAME
           value: "kubenews"
-        - name: POSTGRES_HOST
-          value: "postgre"
+        - name: DB_PASSWORD
+          value: "Pg#123" 
+        - name: DB_HOST
+          value: "postgre" 
         resources:
           requests:
             memory: "512Mi"
