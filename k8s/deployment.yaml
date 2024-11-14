@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubenews
+  labels:
+    name: kubenews
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgre
+  namespace: kubenews
+  labels:
+    app: postgre
+spec:
+  selector:
+    matchLabels:
+      app: postgre
+  template:
+    metadata:
+      labels:
+        app: postgre
+    spec:
+      containers:
+      - name: postgre
+        image: postgres:13
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: "kubenews"
+        - name: POSTGRES_PASSWORD
+          value: "Pg#123"
+        - name: POSTGRES_DB
+          value: "kubenews"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgre
+  namespace: kubenews
+spec:
+  selector:
+    app: postgre
+  ports:
+    - port: 5432
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubenews
+  namespace: kubenews
+  labels:
+    app: kubenews
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubenews
+  template:
+    metadata:
+      labels:
+        app: kubenews
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: kubenews
+        image: julioesf/kube-news
+        ports:
+        - containerPort: 8080
+        env:
+        - name: POSTGRES_USER
+          value: "kubenews"
+        - name: POSTGRES_PASSWORD
+          value: "Pg#123"
+        - name: POSTGRES_DB
+          value: "kubenews"
+        - name: POSTGRES_HOST
+          value: "postgre"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubenews
+  namespace: kubenews
+spec:
+  selector:
+    app: kubenews
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubenews
+  namespace: kubenews
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubenews.masterinfra.io
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: kubenews
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - kubenews.masterinfra.io
+    secretName: kubenews-tls
