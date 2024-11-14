@@ -46,11 +46,11 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1 # ajuste conforme sua região
+        aws-region: us-east-1
 
     - name: Update Route 53 record
       run: |
-        aws route53 change-resource-record-sets --hosted-zone-id ZONE_ID \
+        aws route53 change-resource-record-sets --hosted-zone-id Z02107982DFK4A9701QHT \
           --change-batch '{
             "Changes": [
               {
