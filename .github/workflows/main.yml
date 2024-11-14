@@ -45,6 +45,7 @@ jobs:
       uses: Azure/k8s-deploy@v4.9
       with:
         images: julioesf/kube-news:${{github.run_number}}
+        namespace: kubenews
         manifests: |
           k8s/deployment.yaml
         
